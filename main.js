@@ -2,54 +2,41 @@
 const displayController = (function () {
   // Cache DOM
   const displayElement = document.querySelector(".display");
+  const boardElement = document.querySelector(".grid");
   const cellElements = document.querySelectorAll(".cell");
 
-  const displayCurrentPlayer = () => {
-    const currentPlayer = gameController.getCurrentPlayer().getName();
-    displayElement.innerText = `${currentPlayer}'s turn`;
+  // Public methods
+  const bindEventListeners = () => {
+    boardElement.addEventListener("click", gameController.playRound);
   };
 
-  const updateCell = (cell, value) => {
-    cellElements[cell].innerText = value;
+  const unbindEventListeners = () => {
+    boardElement.removeEventListener("click", gameController.playRound);
   };
 
-  const displayGameResult = () => {
-    const currentPlayer = gameController.getCurrentPlayer();
-    const winnerExists = currentPlayer.isWinner();
-
-    if (winnerExists) {
-      const winnerName = currentPlayer.getName();
-      displayElement.innerText = `${winnerName} has won!`;
-    } else {
-      displayElement.innerText = "It's a draw!";
-    }
+  const displayPlayerTurn = (player) => {
+    displayElement.innerText = `${player.getName()}'s turn`;
   };
 
-  const logBoardState = () => {
-    const gameboard = board.getBoard();
-    let boardDisplay = "\n ";
+  const displayWinner = (player) => {
+    displayElement.innerText = `${player.getName()} has won!`;
+  };
 
-    gameboard.forEach((cell, index) => {
-      boardDisplay += cell;
-      index++;
+  const displayDraw = () => {
+    displayElement.innerText = "It's a draw!";
+  };
 
-      if (index % 9 === 0) {
-        boardDisplay += "\n\n";
-      } else if (index % 3 === 0) {
-        boardDisplay += "\n-----------\n ";
-        index++;
-      } else {
-        boardDisplay += ` | `;
-      }
-    });
-
-    console.log(boardDisplay);
+  const updateCell = (cellIndex, value) => {
+    cellElements[cellIndex].innerText = value;
   };
 
   return {
-    displayCurrentPlayer,
+    bindEventListeners,
+    unbindEventListeners,
+    displayPlayerTurn,
+    displayWinner,
+    displayDraw,
     updateCell,
-    displayGameResult,
   };
 })();
 
@@ -58,17 +45,17 @@ const displayController = (function () {
 // Game board module object
 const board = (function () {
   // Private properties
-  const emptyCell = " ";
+  const emptyValue = " ";
   const gameboard = [
-    emptyCell,
-    emptyCell,
-    emptyCell,
-    emptyCell,
-    emptyCell,
-    emptyCell,
-    emptyCell,
-    emptyCell,
-    emptyCell,
+    emptyValue,
+    emptyValue,
+    emptyValue,
+    emptyValue,
+    emptyValue,
+    emptyValue,
+    emptyValue,
+    emptyValue,
+    emptyValue,
   ];
   const winConditions = [
     [0, 1, 2],
@@ -82,25 +69,29 @@ const board = (function () {
   ];
 
   // Public getter methods
-  const getEmptyCellValue = () => emptyCell;
+  const getEmptyValue = () => emptyValue;
+
   const getBoard = () => gameboard;
+
   const getWinConditions = () => winConditions;
-  const getCellValue = (cell) => gameboard[cell];
+
+  const getCellValue = (cellIndex) => gameboard[cellIndex];
+
   const getCellsWithToken = (token) => {
     const cells = [];
-    gameboard.forEach((value, cell) => {
+    gameboard.forEach((value, cellIndex) => {
       if (token === value) {
-        cells.push(cell);
+        cells.push(cellIndex);
       }
     });
     return cells;
   };
 
   // Public setter methods
-  const setCellValue = (cell, value) => (gameboard[cell] = value);
+  const setCellValue = (cellIndex, value) => (gameboard[cellIndex] = value);
 
   return {
-    getEmptyCellValue,
+    getEmptyValue,
     getBoard,
     getWinConditions,
     getCellValue,
@@ -112,25 +103,22 @@ const board = (function () {
 // --------------------------------------------------------------------------
 
 // Player factory
-function createPlayer(name, token, isHuman) {
-  // Private properties
-  let winner = false;
-
-  // Public getter methods
+function createPlayer(name, token) {
+  // Public methods
   const getName = () => name;
+
   const getToken = () => token;
-  const getIsHuman = () => isHuman;
 
   const isWinner = () => {
     const playerCells = board.getCellsWithToken(token);
+    const winConditions = board.getWinConditions();
 
     let currentRowLength = 0;
-    for (let winnerRow of board.getWinConditions()) {
+    for (let winnerRow of winConditions) {
       for (let winnerCell of winnerRow) {
         if (playerCells.includes(winnerCell)) {
           currentRowLength++;
           if (currentRowLength === 3) {
-            setWinner();
             return true;
           }
         } else {
@@ -142,9 +130,7 @@ function createPlayer(name, token, isHuman) {
     return false;
   };
 
-  const setWinner = () => (winner = true);
-
-  return { getName, getToken, getIsHuman, isWinner };
+  return { getName, getToken, isWinner };
 }
 
 // --------------------------------------------------------------------------
@@ -152,71 +138,62 @@ function createPlayer(name, token, isHuman) {
 // Game controller module object
 const gameController = (function () {
   // Private properties
-  const players = [
-    createPlayer("David", "X", false),
-    createPlayer("Mireia", "O", false),
-  ];
-  let currentPlayer;
-  let winner;
-
-  // Public getter methods
-  const getCurrentPlayer = () => currentPlayer;
-  const getWinner = () => winner;
+  const players = [createPlayer("David", "X"), createPlayer("Mireia", "O")];
+  let currentPlayer = players[0];
+  let roundCounter = 0;
 
   // Private methods
-  const setCurrentPlayer = () => {
+  const switchPlayers = () => {
     currentPlayer = currentPlayer === players[0] ? players[1] : players[0];
-    displayController.displayCurrentPlayer();
   };
 
-  // Player move related methods
-  const getRandomInt = (max) => Math.floor(Math.random() * max);
-
-  const getRandomMove = () => getRandomInt(9);
-
-  const getMoveFromPrompt = () =>
-    Number(prompt(`${currentPlayer.getName()} make your move (0-8)`));
-
-  const getMove = (player) =>
-    player.getIsHuman() ? getMoveFromPrompt() : getRandomMove();
-
-  const getValidMove = (player) => {
-    const isInRange = (cell) => cell >= 0 && cell <= 8;
-    const isAvailable = (cell) =>
-      board.getCellValue(cell) === board.getEmptyCellValue();
-    const isValid = (cell) => isInRange(cell) && isAvailable(cell);
-
-    let cell;
-    do {
-      cell = getMove(player);
-    } while (!isValid(cell));
-
-    return cell;
+  const addRound = () => {
+    roundCounter++;
   };
 
-  const setPlayerMove = (cell) => {
-    board.setCellValue(cell, currentPlayer.getToken());
-    displayController.updateCell(cell, currentPlayer.getToken());
+  const isValidCell = (cellIndex) => {
+    const cellValue = board.getCellValue(cellIndex);
+    const emptyValue = board.getEmptyValue();
+    return cellValue === emptyValue;
   };
 
-  // Main game loop public method
-  const playGame = () => {
-    for (let i = 0; i < 9; i++) {
-      setCurrentPlayer();
-      setPlayerMove(getValidMove(currentPlayer));
+  const setTokenToCell = (cellIndex) => {
+    board.setCellValue(cellIndex, currentPlayer.getToken());
+    displayController.updateCell(cellIndex, currentPlayer.getToken());
+  };
+
+  // Public methods
+  const getCurrentPlayer = () => currentPlayer;
+
+  const playRound = (event) => {
+    const cellIndex = event.target.dataset.index;
+
+    if (isValidCell(cellIndex)) {
+      setTokenToCell(cellIndex);
+
       if (currentPlayer.isWinner()) {
-        displayController.displayGameResult();
+        displayController.displayWinner(currentPlayer);
+        displayController.unbindEventListeners();
         return;
+      } else if (roundCounter === 8) {
+        displayController.displayDraw();
+        displayController.unbindEventListeners();
+      } else {
+        addRound();
+        switchPlayers();
+        displayController.displayPlayerTurn(currentPlayer);
       }
     }
-    displayController.displayGameResult();
   };
 
   return {
     getCurrentPlayer,
-    getWinner,
-    playGame,
+    playRound,
   };
 })();
 
-gameController.playGame();
+// Main execution
+(function main() {
+  displayController.bindEventListeners();
+  displayController.displayPlayerTurn(gameController.getCurrentPlayer());
+})();
