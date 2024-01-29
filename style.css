@@ -56,8 +56,11 @@
 }
 
 .cell {
+  padding: 0;
   background: white;
   border: 1px solid var(--color-neutral-800);
+  color: var(--color-neutral-800);
+  font: 400 clamp(3rem, 15vw, 6rem) / 90% var(--font-primary);
   transition: background-color 0.15s;
 }
 
