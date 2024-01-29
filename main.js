@@ -4,13 +4,15 @@ const displayController = (function () {
   const displayElement = document.querySelector(".display");
   const boardElement = document.querySelector(".grid");
   const cellElements = document.querySelectorAll(".cell");
+  const restartBtn = document.querySelector(".restart-btn");
 
   // Public methods
-  const bindEventListeners = () => {
+  const addEventListeners = () => {
     boardElement.addEventListener("click", gameController.playRound);
+    restartBtn.addEventListener("click", gameController.restartGame);
   };
 
-  const unbindEventListeners = () => {
+  const removeEventListeners = () => {
     boardElement.removeEventListener("click", gameController.playRound);
   };
 
@@ -30,13 +32,26 @@ const displayController = (function () {
     cellElements[cellIndex].innerText = value;
   };
 
+  const resetView = () => {
+    const currentPlayer = gameController.getCurrentPlayer();
+    const boardCopy = board.getBoard();
+    const emptyValue = board.getEmptyValue();
+
+    displayPlayerTurn(currentPlayer);
+
+    boardCopy.forEach((value, cellIndex) => {
+      updateCell(cellIndex, emptyValue);
+    });
+  };
+
   return {
-    bindEventListeners,
-    unbindEventListeners,
+    addEventListeners,
+    removeEventListeners,
     displayPlayerTurn,
     displayWinner,
     displayDraw,
     updateCell,
+    resetView,
   };
 })();
 
@@ -90,6 +105,12 @@ const board = (function () {
   // Public setter methods
   const setCellValue = (cellIndex, value) => (gameboard[cellIndex] = value);
 
+  const resetBoard = () => {
+    gameboard.forEach((value, cellIndex) => {
+      board.setCellValue(cellIndex, emptyValue);
+    });
+  };
+
   return {
     getEmptyValue,
     getBoard,
@@ -97,6 +118,7 @@ const board = (function () {
     getCellValue,
     getCellsWithToken,
     setCellValue,
+    resetBoard,
   };
 })();
 
@@ -139,8 +161,8 @@ function createPlayer(name, token) {
 const gameController = (function () {
   // Private properties
   const players = [createPlayer("David", "X"), createPlayer("Mireia", "O")];
-  let currentPlayer = players[0];
-  let roundCounter = 0;
+  let currentPlayer;
+  let roundCounter;
 
   // Private methods
   const switchPlayers = () => {
@@ -173,11 +195,11 @@ const gameController = (function () {
 
       if (currentPlayer.isWinner()) {
         displayController.displayWinner(currentPlayer);
-        displayController.unbindEventListeners();
+        displayController.removeEventListeners();
         return;
       } else if (roundCounter === 8) {
         displayController.displayDraw();
-        displayController.unbindEventListeners();
+        displayController.removeEventListeners();
       } else {
         addRound();
         switchPlayers();
@@ -186,14 +208,23 @@ const gameController = (function () {
     }
   };
 
+  const resetGameState = () => {
+    currentPlayer = players[0];
+    roundCounter = 0;
+  };
+
+  const restartGame = () => {
+    resetGameState();
+    board.resetBoard();
+    displayController.resetView();
+    displayController.addEventListeners();
+  };
+
   return {
     getCurrentPlayer,
     playRound,
+    restartGame,
   };
 })();
 
-// Main execution
-(function main() {
-  displayController.bindEventListeners();
-  displayController.displayPlayerTurn(gameController.getCurrentPlayer());
-})();
+gameController.restartGame();
