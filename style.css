@@ -72,7 +72,7 @@
   border-radius: 30px;
   box-shadow: 0 4px 0 var(--color-primary-800);
   color: var(--color-neutral-800);
-  font: 400 clamp(1.5rem, 4vw, 2rem) / 80% var(--font-primary);
+  font: 400 clamp(1.5rem, 5vw, 2rem) / 80% var(--font-primary);
   padding: clamp(12px, 2.5vw, 16px) clamp(28px, 4vw, 36px)
     clamp(16px, 3vw, 20px);
   display: flex;
@@ -83,6 +83,6 @@
 
 .restart-btn:hover {
   transform: translate(0, 4px);
-  box-shadow: 0 0 0 var(--btn-border-color);
+  box-shadow: 0 0 0 var(--color-primary-800);
   cursor: pointer;
 }
