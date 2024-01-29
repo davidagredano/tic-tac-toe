@@ -1,3 +1,60 @@
+// Display controller module object
+const displayController = (function () {
+  // Cache DOM
+  const displayElement = document.querySelector(".display");
+  const cellElements = document.querySelectorAll(".cell");
+
+  const displayCurrentPlayer = () => {
+    const currentPlayer = gameController.getCurrentPlayer().getName();
+    displayElement.innerText = `${currentPlayer}'s turn`;
+  };
+
+  const updateCell = (cell, value) => {
+    cellElements[cell].innerText = value;
+  };
+
+  const displayGameResult = () => {
+    const currentPlayer = gameController.getCurrentPlayer();
+    const winnerExists = currentPlayer.isWinner();
+
+    if (winnerExists) {
+      const winnerName = currentPlayer.getName();
+      displayElement.innerText = `${winnerName} has won!`;
+    } else {
+      displayElement.innerText = "It's a draw!";
+    }
+  };
+
+  const logBoardState = () => {
+    const gameboard = board.getBoard();
+    let boardDisplay = "\n ";
+
+    gameboard.forEach((cell, index) => {
+      boardDisplay += cell;
+      index++;
+
+      if (index % 9 === 0) {
+        boardDisplay += "\n\n";
+      } else if (index % 3 === 0) {
+        boardDisplay += "\n-----------\n ";
+        index++;
+      } else {
+        boardDisplay += ` | `;
+      }
+    });
+
+    console.log(boardDisplay);
+  };
+
+  return {
+    displayCurrentPlayer,
+    updateCell,
+    displayGameResult,
+  };
+})();
+
+// --------------------------------------------------------------------------
+
 // Game board module object
 const board = (function () {
   // Private properties
@@ -26,6 +83,7 @@ const board = (function () {
 
   // Public getter methods
   const getEmptyCellValue = () => emptyCell;
+  const getBoard = () => gameboard;
   const getWinConditions = () => winConditions;
   const getCellValue = (cell) => gameboard[cell];
   const getCellsWithToken = (token) => {
@@ -41,36 +99,17 @@ const board = (function () {
   // Public setter methods
   const setCellValue = (cell, value) => (gameboard[cell] = value);
 
-  // Other public methods
-  const displayBoard = () => {
-    let boardDisplay = "\n ";
-
-    gameboard.forEach((cell, index) => {
-      boardDisplay += cell;
-      index++;
-
-      if (index % 9 === 0) {
-        boardDisplay += "\n\n";
-      } else if (index % 3 === 0) {
-        boardDisplay += "\n-----------\n ";
-        index++;
-      } else {
-        boardDisplay += ` | `;
-      }
-    });
-
-    console.log(boardDisplay);
-  };
-
   return {
     getEmptyCellValue,
+    getBoard,
     getWinConditions,
     getCellValue,
     getCellsWithToken,
     setCellValue,
-    displayBoard,
   };
 })();
+
+// --------------------------------------------------------------------------
 
 // Player factory
 function createPlayer(name, token, isHuman) {
@@ -90,15 +129,12 @@ function createPlayer(name, token, isHuman) {
       for (let winnerCell of winnerRow) {
         if (playerCells.includes(winnerCell)) {
           currentRowLength++;
-          // console.log("potential winner found");
           if (currentRowLength === 3) {
             setWinner();
-            // console.log("winner found");
             return true;
           }
         } else {
           currentRowLength = 0;
-          // console.log("nothing found");
           break;
         }
       }
@@ -111,18 +147,26 @@ function createPlayer(name, token, isHuman) {
   return { getName, getToken, getIsHuman, isWinner };
 }
 
+// --------------------------------------------------------------------------
+
 // Game controller module object
-const gameControler = (function () {
+const gameController = (function () {
   // Private properties
   const players = [
     createPlayer("David", "X", false),
     createPlayer("Mireia", "O", false),
   ];
-  let currentPlayer = players[0];
+  let currentPlayer;
+  let winner;
+
+  // Public getter methods
+  const getCurrentPlayer = () => currentPlayer;
+  const getWinner = () => winner;
 
   // Private methods
-  const switchCurrentPlayer = () => {
+  const setCurrentPlayer = () => {
     currentPlayer = currentPlayer === players[0] ? players[1] : players[0];
+    displayController.displayCurrentPlayer();
   };
 
   // Player move related methods
@@ -152,46 +196,27 @@ const gameControler = (function () {
 
   const setPlayerMove = (cell) => {
     board.setCellValue(cell, currentPlayer.getToken());
-  };
-
-  // Display related methods
-  const displayCurrentPlayer = () => {
-    console.log(`${currentPlayer.getName()}'s turn`);
-  };
-
-  const displayGameState = () => {
-    console.clear();
-    displayCurrentPlayer();
-    board.displayBoard();
-  };
-
-  const displayGameResult = (winner) => {
-    if (winner) {
-      displayGameState();
-      console.log(`${winner.getName()} has won!`);
-    } else {
-      displayGameState();
-      console.log("It's a draw!");
-    }
+    displayController.updateCell(cell, currentPlayer.getToken());
   };
 
   // Main game loop public method
   const playGame = () => {
     for (let i = 0; i < 9; i++) {
-      displayGameState();
+      setCurrentPlayer();
       setPlayerMove(getValidMove(currentPlayer));
       if (currentPlayer.isWinner()) {
-        displayGameResult(currentPlayer);
+        displayController.displayGameResult();
         return;
       }
-      switchCurrentPlayer();
     }
-    displayGameResult();
+    displayController.displayGameResult();
   };
 
   return {
+    getCurrentPlayer,
+    getWinner,
     playGame,
   };
 })();
 
-gameControler.playGame();
+gameController.playGame();
