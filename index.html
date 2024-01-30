@@ -21,19 +21,37 @@
     </header>
 
     <main class="main">
-      <h2 class="display">·</h2>
-      <div class="grid">
-        <button class="cell" data-index="0"></button>
-        <button class="cell" data-index="1"></button>
-        <button class="cell" data-index="2"></button>
-        <button class="cell" data-index="3"></button>
-        <button class="cell" data-index="4"></button>
-        <button class="cell" data-index="5"></button>
-        <button class="cell" data-index="6"></button>
-        <button class="cell" data-index="7"></button>
-        <button class="cell" data-index="8"></button>
+      <!-- Input names form -->
+      <form action="post" class="form">
+        <div class="field-group">
+          <div class="field">
+            <label class="label" for="player-x-name">Player X</label>
+            <input class="input" id="player-x-name" placeholder="Enter name" />
+          </div>
+          <div class="field">
+            <label class="label" for="player-o-name">Player O</label>
+            <input class="input" id="player-o-name" placeholder="Enter name" />
+          </div>
+        </div>
+        <button class="btn" type="submit">Play</button>
+      </form>
+
+      <!-- Game -->
+      <div class="game hidden">
+        <h2 class="display">·</h2>
+        <div class="grid">
+          <button class="cell" data-index="0"></button>
+          <button class="cell" data-index="1"></button>
+          <button class="cell" data-index="2"></button>
+          <button class="cell" data-index="3"></button>
+          <button class="cell" data-index="4"></button>
+          <button class="cell" data-index="5"></button>
+          <button class="cell" data-index="6"></button>
+          <button class="cell" data-index="7"></button>
+          <button class="cell" data-index="8"></button>
+        </div>
+        <button class="btn" type="button">Restart</button>
       </div>
-      <button class="restart-btn">Restart</button>
     </main>
   </body>
 </html>
