@@ -1,19 +1,36 @@
 // Display controller module object
 const displayController = (function () {
   // Cache DOM
+  const formView = document.querySelector(".form");
+  const gameView = document.querySelector(".game");
+  const playerXNameInput = document.querySelector("#player-x-name");
+  const playerONameInput = document.querySelector("#player-o-name");
+  const submitNamesBtn = document.querySelector("#play");
+  const restartBtn = document.querySelector("#restart");
   const displayElement = document.querySelector(".display");
   const boardElement = document.querySelector(".grid");
   const cellElements = document.querySelectorAll(".cell");
-  const restartBtn = document.querySelector(".restart-btn");
 
   // Public methods
-  const addEventListeners = () => {
-    boardElement.addEventListener("click", gameController.playRound);
-    restartBtn.addEventListener("click", gameController.restartGame);
+  const addButtonListeners = () => {
+    submitNamesBtn.addEventListener("click", (event) =>
+      gameController.setNewGame(playerXNameInput.value, playerONameInput.value)
+    );
+
+    restartBtn.addEventListener("click", gameController.resetGame);
   };
 
-  const removeEventListeners = () => {
+  const addGameListeners = () => {
+    boardElement.addEventListener("click", gameController.playRound);
+  };
+
+  const removeGameListeners = () => {
     boardElement.removeEventListener("click", gameController.playRound);
+  };
+
+  const switchViews = () => {
+    formView.classList.toggle("hidden");
+    gameView.classList.toggle("hidden");
   };
 
   const displayPlayerTurn = (player) => {
@@ -45,8 +62,10 @@ const displayController = (function () {
   };
 
   return {
-    addEventListeners,
-    removeEventListeners,
+    addButtonListeners,
+    addGameListeners,
+    removeGameListeners,
+    switchViews,
     displayPlayerTurn,
     displayWinner,
     displayDraw,
@@ -160,11 +179,17 @@ function createPlayer(name, token) {
 // Game controller module object
 const gameController = (function () {
   // Private properties
-  const players = [createPlayer("David", "X"), createPlayer("Mireia", "O")];
-  let currentPlayer;
-  let roundCounter;
+  const players = [null, null];
+  let currentPlayer = null;
+  let roundCounter = 0;
 
   // Private methods
+  const setPlayers = (playerXName, playerOName) => {
+    players[0] = createPlayer(playerXName, "X");
+    players[1] = createPlayer(playerOName, "O");
+    return;
+  };
+
   const switchPlayers = () => {
     currentPlayer = currentPlayer === players[0] ? players[1] : players[0];
   };
@@ -195,11 +220,11 @@ const gameController = (function () {
 
       if (currentPlayer.isWinner()) {
         displayController.displayWinner(currentPlayer);
-        displayController.removeEventListeners();
+        displayController.removeGameListeners();
         return;
       } else if (roundCounter === 8) {
         displayController.displayDraw();
-        displayController.removeEventListeners();
+        displayController.removeGameListeners();
       } else {
         addRound();
         switchPlayers();
@@ -213,18 +238,26 @@ const gameController = (function () {
     roundCounter = 0;
   };
 
-  const restartGame = () => {
+  const setNewGame = (playerXName, playerOName) => {
+    event.preventDefault();
+    setPlayers(playerXName, playerOName);
+    resetGame();
+    displayController.switchViews();
+  };
+
+  const resetGame = () => {
     resetGameState();
     board.resetBoard();
     displayController.resetView();
-    displayController.addEventListeners();
+    displayController.addGameListeners();
   };
 
   return {
     getCurrentPlayer,
     playRound,
-    restartGame,
+    setNewGame,
+    resetGame,
   };
 })();
 
-gameController.restartGame();
+displayController.addButtonListeners();

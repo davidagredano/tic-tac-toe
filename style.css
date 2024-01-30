@@ -34,9 +34,6 @@
 .main {
   background: var(--color-neutral);
   flex: 1;
-  /* display: flex;
-  flex-direction: column;
-  align-items: center; */
   padding: 36px 12vw 64px;
 }
 
