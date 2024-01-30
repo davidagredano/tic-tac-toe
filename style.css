@@ -108,6 +108,11 @@
   cursor: pointer;
 }
 
+.btn-group {
+  display: flex;
+  gap: 32px;
+}
+
 .btn {
   display: flex;
   justify-content: center;

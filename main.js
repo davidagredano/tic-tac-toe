@@ -6,6 +6,7 @@ const displayController = (function () {
   const playerXNameInput = document.querySelector("#player-x-name");
   const playerONameInput = document.querySelector("#player-o-name");
   const submitNamesBtn = document.querySelector("#play");
+  const backBtn = document.querySelector("#back");
   const restartBtn = document.querySelector("#restart");
   const displayElement = document.querySelector(".display");
   const boardElement = document.querySelector(".grid");
@@ -18,6 +19,8 @@ const displayController = (function () {
     );
 
     restartBtn.addEventListener("click", gameController.resetGame);
+
+    backBtn.addEventListener("click", switchViews);
   };
 
   const addGameListeners = () => {
