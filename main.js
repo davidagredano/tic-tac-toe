@@ -188,6 +188,9 @@ const gameController = (function () {
 
   // Private methods
   const setPlayers = (playerXName, playerOName) => {
+    if (!playerXName) playerXName = "Player X";
+    if (!playerOName) playerOName = "Player O";
+
     players[0] = createPlayer(playerXName, "X");
     players[1] = createPlayer(playerOName, "O");
     return;
