@@ -2,6 +2,8 @@
 
 ### [Live Demo](https://davidagredano.github.io/tic-tac-toe/)
 
+[![tic-tac-toe-game-preview](https://github.com/davidagredano/tic-tac-toe/assets/118218196/ca782bf4-7806-4297-887f-3cbd740d3740)](https://davidagredano.github.io/tic-tac-toe/)
+
 A Tic-tac-toe game created in Vanilla JavaScript.
 
 ## Learning goal
