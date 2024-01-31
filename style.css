@@ -116,7 +116,8 @@
 .btn {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: end;
+  gap: 8px;
   margin-top: 48px;
   padding: clamp(12px, 2.5vw, 16px) clamp(28px, 4vw, 36px)
     clamp(16px, 3vw, 20px);
