@@ -13,6 +13,31 @@ const displayController = (function () {
   const cellElements = document.querySelectorAll(".cell");
 
   // Private methods
+  const addHoverEffect = (event) => {
+    if (event.target.classList.contains("cell")) {
+      const cell = event.target;
+      const isEmptyCell = !cell.classList.contains("fixed");
+      const currentPlayerToken = gameController.getCurrentPlayer().getToken();
+
+      if (isEmptyCell) {
+        cell.classList.add("hover");
+        cell.innerText = currentPlayerToken;
+      }
+    }
+  };
+
+  const removeHoverEffect = (event) => {
+    if (event.target.classList.contains("cell")) {
+      const cell = event.target;
+      const isEmptyCell = !cell.classList.contains("fixed");
+
+      if (isEmptyCell) {
+        cell.innerText = "";
+      }
+      cell.classList.remove("hover");
+    }
+  };
+
   const addWinnerCellEffect = (cellIndex) => {
     cellElements[cellIndex].classList.add("winner");
   };
@@ -20,6 +45,9 @@ const displayController = (function () {
   const removeWinnerCellEffect = (cellIndex) => {
     cellElements[cellIndex].classList.remove("winner");
   };
+
+  const setEmptyCell = (cellIndex) =>
+    cellElements[cellIndex].classList.remove("fixed");
 
   // Public methods
   const addButtonListeners = () => {
@@ -32,11 +60,16 @@ const displayController = (function () {
     backBtn.addEventListener("click", switchViews);
   };
 
-  const addGameListeners = () =>
+  const addGameListeners = () => {
     boardElement.addEventListener("click", gameController.playRound);
+    boardElement.addEventListener("pointerover", addHoverEffect);
+    boardElement.addEventListener("pointerout", removeHoverEffect);
+  };
 
   const removeGameListeners = () => {
     boardElement.removeEventListener("click", gameController.playRound);
+    boardElement.removeEventListener("pointerover", addHoverEffect);
+    boardElement.removeEventListener("pointerout", removeHoverEffect);
   };
 
   const switchViews = () => {
@@ -59,6 +92,11 @@ const displayController = (function () {
   const updateCell = (cellIndex, value) =>
     (cellElements[cellIndex].innerText = value);
 
+  const setFixedCell = (cellIndex) => {
+    cellElements[cellIndex].classList.remove("hover");
+    cellElements[cellIndex].classList.add("fixed");
+  };
+
   const addWinnerRowEffect = (winnerRow) =>
     winnerRow.forEach((cellIndex) => addWinnerCellEffect(cellIndex));
 
@@ -72,6 +110,7 @@ const displayController = (function () {
     boardCopy.forEach((value, cellIndex) => {
       updateCell(cellIndex, emptyValue);
       removeWinnerCellEffect(cellIndex);
+      setEmptyCell(cellIndex);
     });
   };
 
@@ -84,6 +123,7 @@ const displayController = (function () {
     displayWinnerPlayer,
     displayDraw,
     updateCell,
+    setFixedCell,
     addWinnerRowEffect,
     resetView,
   };
@@ -244,6 +284,7 @@ const gameController = (function () {
     if (isAvailableCell(cellIndex)) {
       board.setCellValue(cellIndex, currentPlayer.getToken());
       displayController.updateCell(cellIndex, currentPlayer.getToken());
+      displayController.setFixedCell(cellIndex);
 
       if (currentPlayer.isWinner()) {
         displayController.addWinnerRowEffect(board.getWinnerRow());
