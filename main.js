@@ -52,6 +52,21 @@ const displayController = (function () {
     cellElements[cellIndex].innerText = value;
   };
 
+  const displayWinnerRow = (winnerRow) => {
+    console.log(winnerRow);
+    winnerRow.forEach((cellIndex) => displayWinnerCell(cellIndex));
+  };
+
+  const displayWinnerCell = (cellIndex) => {
+    console.log("add winner cell", cellIndex);
+    cellElements[cellIndex].classList.add("winner");
+  };
+
+  const removeWinnerCell = (cellIndex) => {
+    console.log("remove winner cell", cellIndex);
+    cellElements[cellIndex].classList.remove("winner");
+  };
+
   const resetView = () => {
     const currentPlayer = gameController.getCurrentPlayer();
     const boardCopy = board.getBoard();
@@ -61,6 +76,7 @@ const displayController = (function () {
 
     boardCopy.forEach((value, cellIndex) => {
       updateCell(cellIndex, emptyValue);
+      removeWinnerCell(cellIndex);
     });
   };
 
@@ -73,6 +89,7 @@ const displayController = (function () {
     displayWinner,
     displayDraw,
     updateCell,
+    displayWinnerRow,
     resetView,
   };
 })();
@@ -104,6 +121,7 @@ const board = (function () {
     [3, 4, 5],
     [6, 7, 8],
   ];
+  let winnerRow = [null, null, null];
 
   // Public getter methods
   const getEmptyValue = () => emptyValue;
@@ -124,13 +142,21 @@ const board = (function () {
     return cells;
   };
 
+  const getWinnerRow = () => winnerRow;
+
   // Public setter methods
   const setCellValue = (cellIndex, value) => (gameboard[cellIndex] = value);
 
+  const setWinnerRow = (row) => (winnerRow = row);
+
+  const resetWinnerRow = () => (winnerRow = [null, null, null]);
+
+  // Other methods
   const resetBoard = () => {
     gameboard.forEach((value, cellIndex) => {
       board.setCellValue(cellIndex, emptyValue);
     });
+    resetWinnerRow();
   };
 
   return {
@@ -139,7 +165,9 @@ const board = (function () {
     getWinConditions,
     getCellValue,
     getCellsWithToken,
+    getWinnerRow,
     setCellValue,
+    setWinnerRow,
     resetBoard,
   };
 })();
@@ -163,6 +191,7 @@ function createPlayer(name, token) {
         if (playerCells.includes(winnerCell)) {
           currentRowLength++;
           if (currentRowLength === 3) {
+            board.setWinnerRow(winnerRow);
             return true;
           }
         } else {
@@ -225,6 +254,7 @@ const gameController = (function () {
       setTokenToCell(cellIndex);
 
       if (currentPlayer.isWinner()) {
+        displayController.displayWinnerRow(board.getWinnerRow());
         displayController.displayWinner(currentPlayer);
         displayController.removeGameListeners();
         return;

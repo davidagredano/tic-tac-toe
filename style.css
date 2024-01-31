@@ -75,7 +75,6 @@
   padding: clamp(12px, 2.5vw, 16px) clamp(28px, 4vw, 36px)
     clamp(16px, 3vw, 20px);
   border: 2px solid var(--color-neutral-600);
-  /* border: none; */
   border-radius: 50px;
   max-width: 14ch;
 }
@@ -101,12 +100,17 @@
   border: 1px solid var(--color-neutral-800);
   color: var(--color-neutral-800);
   font: 400 clamp(4rem, 15vw, 5rem) var(--font-tokens);
-  transition: background-color 0.15s;
+  transition: background-color 0.15s, font 0.1s;
 }
 
 .cell:hover {
   background: var(--color-primary-50);
   cursor: pointer;
+}
+
+.winner {
+  color: #eab308;
+  font: 600 clamp(5rem, 16vw, 6rem) var(--font-tokens);
 }
 
 .btn-group {
