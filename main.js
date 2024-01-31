@@ -12,6 +12,15 @@ const displayController = (function () {
   const boardElement = document.querySelector(".grid");
   const cellElements = document.querySelectorAll(".cell");
 
+  // Private methods
+  const addWinnerCellEffect = (cellIndex) => {
+    cellElements[cellIndex].classList.add("winner");
+  };
+
+  const removeWinnerCellEffect = (cellIndex) => {
+    cellElements[cellIndex].classList.remove("winner");
+  };
+
   // Public methods
   const addButtonListeners = () => {
     submitNamesBtn.addEventListener("click", (event) =>
@@ -23,9 +32,8 @@ const displayController = (function () {
     backBtn.addEventListener("click", switchViews);
   };
 
-  const addGameListeners = () => {
+  const addGameListeners = () =>
     boardElement.addEventListener("click", gameController.playRound);
-  };
 
   const removeGameListeners = () => {
     boardElement.removeEventListener("click", gameController.playRound);
@@ -40,7 +48,7 @@ const displayController = (function () {
     displayElement.innerText = `${player.getName()}'s turn`;
   };
 
-  const displayWinner = (player) => {
+  const displayWinnerPlayer = (player) => {
     displayElement.innerText = `${player.getName()} has won!`;
   };
 
@@ -48,21 +56,11 @@ const displayController = (function () {
     displayElement.innerText = "It's a draw!";
   };
 
-  const updateCell = (cellIndex, value) => {
-    cellElements[cellIndex].innerText = value;
-  };
+  const updateCell = (cellIndex, value) =>
+    (cellElements[cellIndex].innerText = value);
 
-  const displayWinnerRow = (winnerRow) => {
-    winnerRow.forEach((cellIndex) => displayWinnerCell(cellIndex));
-  };
-
-  const displayWinnerCell = (cellIndex) => {
-    cellElements[cellIndex].classList.add("winner");
-  };
-
-  const removeWinnerCell = (cellIndex) => {
-    cellElements[cellIndex].classList.remove("winner");
-  };
+  const addWinnerRowEffect = (winnerRow) =>
+    winnerRow.forEach((cellIndex) => addWinnerCellEffect(cellIndex));
 
   const resetView = () => {
     const currentPlayer = gameController.getCurrentPlayer();
@@ -73,7 +71,7 @@ const displayController = (function () {
 
     boardCopy.forEach((value, cellIndex) => {
       updateCell(cellIndex, emptyValue);
-      removeWinnerCell(cellIndex);
+      removeWinnerCellEffect(cellIndex);
     });
   };
 
@@ -83,10 +81,10 @@ const displayController = (function () {
     removeGameListeners,
     switchViews,
     displayPlayerTurn,
-    displayWinner,
+    displayWinnerPlayer,
     displayDraw,
     updateCell,
-    displayWinnerRow,
+    addWinnerRowEffect,
     resetView,
   };
 })();
@@ -230,31 +228,27 @@ const gameController = (function () {
     roundCounter++;
   };
 
-  const isValidCell = (cellIndex) => {
+  const isAvailableCell = (cellIndex) => {
     const cellValue = board.getCellValue(cellIndex);
     const emptyValue = board.getEmptyValue();
     return cellValue === emptyValue;
-  };
-
-  const setTokenToCell = (cellIndex) => {
-    board.setCellValue(cellIndex, currentPlayer.getToken());
-    displayController.updateCell(cellIndex, currentPlayer.getToken());
   };
 
   // Public methods
   const getCurrentPlayer = () => currentPlayer;
 
   const playRound = (event) => {
-    const cellIndex = event.target.dataset.index;
+    const cell = event.target;
+    const cellIndex = cell.dataset.index;
 
-    if (isValidCell(cellIndex)) {
-      setTokenToCell(cellIndex);
+    if (isAvailableCell(cellIndex)) {
+      board.setCellValue(cellIndex, currentPlayer.getToken());
+      displayController.updateCell(cellIndex, currentPlayer.getToken());
 
       if (currentPlayer.isWinner()) {
-        displayController.displayWinnerRow(board.getWinnerRow());
-        displayController.displayWinner(currentPlayer);
+        displayController.addWinnerRowEffect(board.getWinnerRow());
+        displayController.displayWinnerPlayer(currentPlayer);
         displayController.removeGameListeners();
-        return;
       } else if (roundCounter === 8) {
         displayController.displayDraw();
         displayController.removeGameListeners();
