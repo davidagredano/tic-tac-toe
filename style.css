@@ -7,6 +7,7 @@
   --color-neutral-800: #292524;
 
   --font-primary: "Barlow", sans-serif;
+  --font-tokens: "Comfortaa", sans-serif;
 }
 
 .body {
@@ -95,11 +96,11 @@
 }
 
 .cell {
-  padding: 0;
+  padding: 14px 0 0;
   background: white;
   border: 1px solid var(--color-neutral-800);
   color: var(--color-neutral-800);
-  font: 400 clamp(3rem, 15vw, 6rem) / 90% var(--font-primary);
+  font: 400 clamp(4rem, 15vw, 5rem) var(--font-tokens);
   transition: background-color 0.15s;
 }
 
