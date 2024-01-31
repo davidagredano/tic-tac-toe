@@ -53,17 +53,14 @@ const displayController = (function () {
   };
 
   const displayWinnerRow = (winnerRow) => {
-    console.log(winnerRow);
     winnerRow.forEach((cellIndex) => displayWinnerCell(cellIndex));
   };
 
   const displayWinnerCell = (cellIndex) => {
-    console.log("add winner cell", cellIndex);
     cellElements[cellIndex].classList.add("winner");
   };
 
   const removeWinnerCell = (cellIndex) => {
-    console.log("remove winner cell", cellIndex);
     cellElements[cellIndex].classList.remove("winner");
   };
 
