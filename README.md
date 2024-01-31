@@ -8,7 +8,7 @@ A Tic-tac-toe game created in Vanilla JavaScript.
 
 ## Learning goal
 
-To use Factory functions and the Module pattern to create a good architecture applying the single responsibility and separation of concerns principles.
+Use Factory functions and the Module pattern to create a good architecture that applies the single responsibility and separation of concerns principles.
 
 Components:
 
