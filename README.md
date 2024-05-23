@@ -1,6 +1,4 @@
-# JavaScript Tic-Tac-Toe Game
-
-### [Live Demo](https://davidagredano.github.io/tic-tac-toe/)
+# JavaScript Tic-Tac-Toe — [Live Demo](https://davidagredano.github.io/tic-tac-toe/)
 
 [![tic-tac-toe-game-preview](https://github.com/davidagredano/tic-tac-toe/assets/118218196/ca782bf4-7806-4297-887f-3cbd740d3740)](https://davidagredano.github.io/tic-tac-toe/)
 
@@ -16,3 +14,11 @@ Components:
 2. A player factory in charge of the player objects creation
 3. A board module with all the game board’s logic
 4. A display controller module that handles the display/DOM logic
+
+## Contact Me
+
+Hello! 👋 I'm David, the creator of this project. If you have any questions, suggestions, or just want to chat about web development or anything else related to this project, feel free to reach out to me.
+
+My email is davidagredano@gmail.com.
+
+Looking forward to hearing from you!
