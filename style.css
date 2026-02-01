@@ -142,6 +142,11 @@
   cursor: pointer;
 }
 
+.btn:active {
+  transform: translate(0, 4px);
+  box-shadow: 0 0 0 var(--color-primary-800);
+}
+
 .hidden {
   display: none;
 }
